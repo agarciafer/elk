@@ -1,0 +1,37 @@
+input {
+    beats {
+        port => 5044
+    }
+}
+
+filter {
+        grok {
+            match => {"message" =>"%{WORD:level} %{TIMESTAMP_ISO8601:date} \[%{WORD:tread}\] %{JAVACLASS:class} - %{WORD:type}\|%{NUMBER:status}\|%{USERNAME:user}\|%{IP:ip}"}
+
+}
+}
+
+output {
+        if "_grokparsefailure" not in [tags] {
+            elasticsearch {
+                hosts => "localhost:9200"
+                index => "log-generator-%{+YYYY.MM.dd}"
+  }
+if [type] == "LOGIN" {
+    email {
+      address => "smtp.gmail.com"
+      port => "587"
+      use_tls => true
+      username => "usuario@gmail.com"
+      password => "password"
+      from => "usuario@gmail.com"
+      to => "usuario@correo.com"
+      subject => "%{[appid]}: LOGIN"
+      body => "An LOGIN event has been detected on %{[appid]}:\n- Timestamp: %{[timestamp]}\n- Source: %{[class]}\n- Message: %{[message]}\n- Stacktrace: %{[stacktrace]}"
+    }
+  }
+
+} else {
+      stdout {}
+}
+}
