@@ -12,7 +12,7 @@ services:
       - grafana-volume:/var/lib/grafana  
   
   influxdb:
-    image: influxdb
+    image: influxdb:1.7
     container_name: influxdb
     restart: always
     ports:
